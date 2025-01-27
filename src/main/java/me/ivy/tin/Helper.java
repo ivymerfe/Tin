@@ -1,0 +1,47 @@
+package me.ivy.tin;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.util.math.MathHelper;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+public class Helper {
+    public static int randomInt(int origin, int deviation, int min, int max) {
+        return MathHelper.clamp(ThreadLocalRandom.current().nextInt(origin-deviation, origin+deviation), min, max);
+    }
+
+    public static double randomDouble(double origin, double deviation, double min, double max) {
+        return MathHelper.clamp(ThreadLocalRandom.current().nextDouble(origin-deviation, origin+deviation), min, max);
+    }
+
+    public static boolean shouldWaitForCrit() {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player == null) {
+            return false;
+        }
+        return MinecraftClient.getInstance().options.jumpKey.isPressed()
+                && (player.isOnGround() || player.getVelocity().y > -0.1)
+                && !player.isClimbing()
+                && !player.isTouchingWater()
+                && !player.hasStatusEffect(StatusEffects.BLINDNESS)
+                && !player.hasVehicle();
+    }
+
+    public static int getRandomAttackCooldown(int dev, int min, int max) {
+        if(MinecraftClient.getInstance().player == null) {
+            return 0;
+        }
+        int fullProgressTicks = Math.round(MinecraftClient.getInstance().player.getAttackCooldownProgressPerTick());
+        return randomInt(fullProgressTicks, dev, min, max);
+    }
+
+    public static int getRemainingTicks() {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if(player == null) {
+            return 0;
+        }
+        return Math.round((1-player.getAttackCooldownProgress(0))*player.getAttackCooldownProgressPerTick());
+    }
+}

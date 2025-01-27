@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"id": "tin",
+	"version": "${version}",
+	"name": "Tin",
+	"authors": [
+		"Ivy"
+	],
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"me.ivy.tin.Init"
+		]
+	},
+	"mixins": [
+		"tin.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
