@@ -28,8 +28,10 @@ public class MinecraftClientMixin implements IMinecraftClient {
             method = "handleBlockBreaking(Z)V",
             cancellable = true)
     private void onBlockBreaking(boolean breaking, CallbackInfo ci) {
-        if (breaking && Tin.getHack().cancelBreaking()) {
-            ci.cancel();
+        if (Tin.getInstance().isEnabled()) {
+            if (breaking && Tin.getHack().cancelBreaking()) {
+                ci.cancel();
+            }
         }
     }
 

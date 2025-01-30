@@ -10,7 +10,8 @@
     "LivingEntityRendererMixin",
     "EntityRenderDispatcherMixin",
     "EntityRendererMixin",
-    "ProjectileUtilMixin"
+    "ProjectileUtilMixin",
+    "EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

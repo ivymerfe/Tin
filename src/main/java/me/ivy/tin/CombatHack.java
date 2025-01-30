@@ -1,6 +1,8 @@
 package me.ivy.tin;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.GlfwUtil;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.hit.HitResult;
@@ -10,18 +12,29 @@ import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Comparator;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CombatHack {
-    private final Tin TIN;
+    final Tin TIN;
 
     public CombatHack(Tin tin) {
         this.TIN = tin;
     }
 
-    private Entity target;
-    private int enableButtonDoubleclickTicks = 0;
-    private int nextAttackTicks = 0;
-    private boolean extendHitboxes = false;
+    Entity target;
+    int enableButtonDoubleclickTicks = 0;
+    int nextAttackTicks = 0;
+    boolean extendHitboxes = false;
+    int smoothTicks = 0;
+    int smoothMaxTicks = 1;
+    double alpha = 1;
+    double beta = 1;
+    double min = 0.5;
+    double max = 2;
+    double gamma = 0.75;
+    boolean missSignal = false;
+    int targetLostTicks = 0;
+    double noDragSpeedMult = 1;
 
     public void onKey(int action, int key) {
         if (action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_F12) {
@@ -53,17 +66,27 @@ public class CombatHack {
     }
 
     public boolean cancelAttack() {  // true = cancel
-        HitResult crosshairTarget = MinecraftClient.getInstance().crosshairTarget;
-        if (crosshairTarget != null && crosshairTarget.getType() != HitResult.Type.ENTITY && target != null) {
-            // TODO - chance to not cancel
+        if (!missSignal && MinecraftClient.getInstance().targetedEntity == null && target != null) {
             return true;
         }
+        smoothTicks = 0;
         nextAttackTicks = randomAttackCooldown();
+        updateParameters();
+        missSignal = false;
         return false;
     }
 
+    private void updateParameters() {
+        smoothMaxTicks = Helper.randomInt(TIN.config.getSmoothTicks(), 4, 5, 200);
+        alpha = Helper.randomDouble(2, 0.5, 1, 3);
+        beta = Helper.randomDouble(1.6, 0.3, 1.3, 1.8);
+        min = Helper.randomDouble(0.5, 0.25, 0.25, 0.75);
+        max = Helper.randomDouble(1.5, 0.3, 1, 2);
+        gamma = Helper.randomDouble(1, 0.4, 0.5, 2);
+    }
+
     public boolean cancelBreaking() {
-        return target != null;
+        return target != null || targetLostTicks > 0;
     }
 
     private Entity findTarget() {
@@ -75,10 +98,11 @@ public class CombatHack {
         Vec3d cameraPos = camera.getCameraPosVec(0);
         Vec3d rotation = camera.getRotationVec(0);
         Box box = camera.getBoundingBox().expand(10,6,10);
+        double aimAngle = TIN.config.getAimbotAngle();
         return mc.world.getOtherEntities(camera, box)
                 .stream()
-                .filter(e -> e instanceof LivingEntity)
-                .filter(e -> RotationUtils.angleXZ(cameraPos,rotation,e) < 1)  // ~60 degress
+                .filter(e -> e instanceof LivingEntity && e.isAlive())
+                .filter(e -> RotationUtils.angleXZ(cameraPos,rotation,e) < aimAngle)
                 .min(Comparator.comparingDouble(e -> RotationUtils.angleXZ(cameraPos,rotation,e)))
                 .orElse(null);
     }
@@ -90,9 +114,28 @@ public class CombatHack {
         if (!TIN.isEnabled()) {
             return;
         }
-        target = findTarget();
-        updateAttackTicks();
-        maybeAttack();
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.targetedEntity != null) {
+            noDragSpeedMult = TIN.config.getNoDragBase();
+        } else {
+            noDragSpeedMult = Math.min(1, noDragSpeedMult*TIN.config.getNoDragMult());
+        }
+        if (TIN.config.aimbotEnabled) {
+            boolean hadTarget = target != null;
+            target = findTarget();
+            smoothTicks = (smoothTicks+1)%smoothMaxTicks;
+            if (hadTarget && target == null) {
+                targetLostTicks = TIN.config.getBlockBreakingDelay();
+            }
+            if (targetLostTicks > 0) {
+                targetLostTicks--;
+            }
+        }
+        if (TIN.config.autoAttack) {
+            updateAttackTicks();
+            maybeMiss();
+            maybeAttack();
+        }
     }
 
     private int randomAttackCooldown() {
@@ -111,16 +154,32 @@ public class CombatHack {
         }
     }
 
+    private void maybeMiss() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (target != null && mc.targetedEntity == null && !mc.player.isUsingItem() && ThreadLocalRandom.current().nextDouble() < TIN.config.getMissChance()) {
+            if (TIN.config.isAimbotButtonPressed()) {
+                missSignal = true;
+                ((IMinecraftClient) mc).doAttackA();
+                nextAttackTicks = randomAttackCooldown();
+            }
+        }
+    }
+
     private void maybeAttack() {
-        Entity targetedEntity = MinecraftClient.getInstance().targetedEntity;
-        if (targetedEntity != null && nextAttackTicks == 0 && !Helper.shouldWaitForCrit()) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        Entity targetedEntity = mc.targetedEntity;
+        if (targetedEntity != null && nextAttackTicks == 0 && (!TIN.config.waitForCrits || !Helper.shouldWaitForCrit())) {
             if (targetedEntity instanceof LivingEntity livingEntity) {
                 if (livingEntity.hurtTime > 0 || !livingEntity.isAlive()) {
                     return;
                 }
             }
-            if (MinecraftClient.getInstance().options.attackKey.isPressed()) {
-                ((IMinecraftClient)MinecraftClient.getInstance()).doAttackA();
+            if (mc.player.isUsingItem()) {
+                nextAttackTicks = ThreadLocalRandom.current().nextInt(1, 3);
+                return;
+            }
+            if (TIN.config.isAimbotButtonPressed()) {
+                ((IMinecraftClient)mc).doAttackA();
                 nextAttackTicks = randomAttackCooldown();
             }
         }
@@ -131,7 +190,7 @@ public class CombatHack {
             return;
         }
         MinecraftClient mc = MinecraftClient.getInstance();
-        if (!mc.options.attackKey.isPressed()) {
+        if (!TIN.config.isAimbotButtonPressed()) {
             return;
         }
         Entity cameraEntity = mc.getCameraEntity();
@@ -153,12 +212,10 @@ public class CombatHack {
         double yawDelta = MathHelper.wrapDegrees(neededYaw-yaw);
         double pitchDelta = neededPitch-pitch;
 
-        double hSpeed = TIN.config.getHorizontalSpeed();
-        double vSpeed = TIN.config.getVerticalSpeed();
-        hSpeed = Helper.randomDouble(hSpeed, hSpeed*0.2, 1, 6);
-        vSpeed = Helper.randomDouble(vSpeed, vSpeed*0.2, 1, 6);
-
-        // TODO add minimum absolute value
+        double hSpeed = TIN.config.getHorizontalSpeed()*noDragSpeedMult;
+        double vSpeed = TIN.config.getVerticalSpeed()*noDragSpeedMult;
+        hSpeed *= Helper.smoothFunction((double) (smoothTicks+tickDelta) / smoothMaxTicks, alpha, beta, min, max);
+        vSpeed *= Helper.smoothFunction((double) (smoothTicks+tickDelta) / smoothMaxTicks, alpha*gamma, beta, min, max);
         yawDelta = MathHelper.clamp(yawDelta, -hSpeed, hSpeed);
         pitchDelta = MathHelper.clamp(pitchDelta, -vSpeed, vSpeed);
 

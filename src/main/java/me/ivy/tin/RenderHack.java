@@ -42,6 +42,9 @@ public class RenderHack {
     }
 
     public void renderWithoutDepth(MatrixStack matrixStack, VertexConsumerProvider.Immediate immediate, List<Entity> entities) {
+        if (!TIN.isEnabled() || !TIN.config.entityXray) {
+            return;
+        }
         MinecraftClient client = MinecraftClient.getInstance();
         if (!InputUtil.isKeyPressed(client.getWindow().getHandle(), InputUtil.GLFW_KEY_R)) {
             return;

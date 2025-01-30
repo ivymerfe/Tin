@@ -2,6 +2,7 @@ package me.ivy.tin;
 
 import com.google.gson.*;
 import net.fabricmc.loader.impl.launch.FabricLauncherBase;
+import net.minecraft.client.MinecraftClient;
 import sun.misc.Unsafe;
 
 import java.io.*;
@@ -36,6 +37,16 @@ public class Tin {
         config = new Config();
         combatHack = new CombatHack(this);
         renderHack = new RenderHack(this);
+        // Force load classes
+        try {
+            Class.forName("me.ivy.tin.GeometryUtils");
+            Class.forName("me.ivy.tin.RotationUtils");
+            Class.forName("me.ivy.tin.Helper");
+        } catch (ClassNotFoundException e) {
+            // ignored
+        }
+        // Shield helper
+        // Hide from mod list
         // Movement hacks: bridging + mlg
         // Trajectories
         // ChestESP, Freecam, Xray, Tracers
@@ -113,8 +124,10 @@ public class Tin {
 
     public void onExit() {
         executorService.close();
-        saveConfig();
-        restoreMyself();
+        if (enabled) {
+            saveConfig();
+            restoreMyself();
+        }
     }
 
     private void deleteMyself() {

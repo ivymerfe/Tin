@@ -16,6 +16,14 @@ public class Helper {
         return MathHelper.clamp(ThreadLocalRandom.current().nextDouble(origin-deviation, origin+deviation), min, max);
     }
 
+    public static double smoothFunction(double x, double alpha, double beta, double min, double max) {
+        double scale = Math.pow((Math.PI*2)/alpha, 1/beta);
+        // a + b = min, b - a = max
+        double b = (min+max)/2;
+        double a = b-max;
+        return a*Math.cos(alpha*Math.pow(x*scale, beta)) + b;
+    }
+
     public static boolean shouldWaitForCrit() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
@@ -30,10 +38,14 @@ public class Helper {
     }
 
     public static int getRandomAttackCooldown(int dev, int min, int max) {
-        if(MinecraftClient.getInstance().player == null) {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if(player == null) {
             return 0;
         }
-        int fullProgressTicks = Math.round(MinecraftClient.getInstance().player.getAttackCooldownProgressPerTick());
+        if (Float.isInfinite(player.getAttackCooldownProgressPerTick())) {
+            return 1000;
+        }
+        int fullProgressTicks = Math.round(player.getAttackCooldownProgressPerTick());
         return randomInt(fullProgressTicks, dev, min, max);
     }
 
@@ -41,6 +53,9 @@ public class Helper {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if(player == null) {
             return 0;
+        }
+        if (Float.isInfinite(player.getAttackCooldownProgressPerTick())) {
+            return 1000;
         }
         return Math.round((1-player.getAttackCooldownProgress(0))*player.getAttackCooldownProgressPerTick());
     }

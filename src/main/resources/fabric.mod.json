@@ -1,11 +1,7 @@
 {
 	"schemaVersion": 1,
-	"id": "tin",
-	"version": "${version}",
-	"name": "Tin",
-	"authors": [
-		"Ivy"
-	],
+	"id": "fabric-game-rule-api-v1",
+	"version": "1.0.62+7feeb73304",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -19,6 +15,7 @@
 		"fabricloader": ">=0.16.9",
 		"minecraft": "~1.21.4",
 		"java": ">=21",
-		"fabric-api": "*"
+		"fabric-api": "=0.111.0+1.21.4",
+		"fabric-game-rule-api-v1": "=1.0.62+7feeb73304"
 	}
 }
