@@ -29,10 +29,13 @@ public class Config {
     public boolean fullbright = true;
     public boolean playerESP = true;
     public boolean entityXray = true;
-    public boolean noBlindness = true;
-    public boolean noNausea = true;
+    public boolean noFog = true;
     public boolean noOverlays = true;
-    public double fireOffset = 16;
+    public boolean noNausea = true;
+    public double fireOffset = 0.3;
+    public double heldItemOffsetX = 0.0;
+    public double heldItemOffsetY = -0.2;
+    public double heldItemOffsetZ = 0.0;
 
     public boolean isAimbotButtonPressed() {
         aimbotButton = MathHelper.clamp(aimbotButton, 0, 8);
@@ -85,7 +88,7 @@ public class Config {
     }
 
     public double getNoDragMult() {
-        noDragMult = MathHelper.clamp(noDragMult, 1.1, 2);
+        noDragMult = MathHelper.clamp(noDragMult, 1.1, 4);
         return noDragMult;
     }
 }

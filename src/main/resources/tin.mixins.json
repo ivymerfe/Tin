@@ -11,7 +11,12 @@
     "EntityRenderDispatcherMixin",
     "EntityRendererMixin",
     "ProjectileUtilMixin",
-    "EntityMixin"
+    "EntityMixin",
+    "ClientPlayerEntityMixin",
+    "BackgroundRendererMixin",
+    "InGameHudMixin",
+    "InGameOverlayRendererMixin",
+    "HeldItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

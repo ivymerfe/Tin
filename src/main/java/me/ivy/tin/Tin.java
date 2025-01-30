@@ -45,8 +45,6 @@ public class Tin {
         } catch (ClassNotFoundException e) {
             // ignored
         }
-        // Shield helper
-        // Hide from mod list
         // Movement hacks: bridging + mlg
         // Trajectories
         // ChestESP, Freecam, Xray, Tracers

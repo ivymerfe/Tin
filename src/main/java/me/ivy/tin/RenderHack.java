@@ -7,6 +7,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
@@ -27,6 +28,29 @@ public class RenderHack {
 
     public double getGamma(double base) {
         return (TIN.isEnabled() && TIN.config.fullbright) ? 16.0 : base;
+    }
+
+    public boolean noFog() {
+        return TIN.isEnabled() && TIN.config.noFog;
+    }
+
+    public boolean noOverlays() {
+        return TIN.isEnabled() && TIN.config.noOverlays;
+    }
+
+    public boolean noNausea() {
+        return TIN.isEnabled() && TIN.config.noNausea;
+    }
+
+    public double getFireOffset() {
+        return TIN.isEnabled() ? TIN.config.fireOffset : 0;
+    }
+
+    public Vec3d getHeldItemOffset() {
+        if (!TIN.isEnabled()) {
+            return Vec3d.ZERO;
+        }
+        return new Vec3d(TIN.config.heldItemOffsetX, TIN.config.heldItemOffsetY, TIN.config.heldItemOffsetZ);
     }
 
     public int getInvisiblePlayerColor() {
