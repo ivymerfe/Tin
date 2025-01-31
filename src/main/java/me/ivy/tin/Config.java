@@ -17,7 +17,7 @@ public class Config {
     private double verticalSpeed = 1;
     private int smoothTicks = 10;
     private int blockBreakingDelay = 10;
-    private double noDragBase = 0.3;
+    private double noDragBase = 0.5;
     private double noDragMult = 1.6;
 
     public boolean showHitboxes = true;
@@ -32,10 +32,11 @@ public class Config {
     public boolean noFog = true;
     public boolean noOverlays = true;
     public boolean noNausea = true;
-    public double fireOffset = 0.3;
+    public double fireOffset = -0.3;
     public double heldItemOffsetX = 0.0;
-    public double heldItemOffsetY = -0.2;
-    public double heldItemOffsetZ = 0.0;
+    public double heldItemOffsetY = -0.1;
+    public double heldItemOffsetZ = -0.2;
+    public double shieldOffset = -0.2;
 
     public boolean isAimbotButtonPressed() {
         aimbotButton = MathHelper.clamp(aimbotButton, 0, 8);

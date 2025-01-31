@@ -35,6 +35,7 @@ public class CombatHack {
     boolean missSignal = false;
     int targetLostTicks = 0;
     double noDragSpeedMult = 1;
+    double critMinVelocity = -0.1;
 
     public void onKey(int action, int key) {
         if (action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_F12) {
@@ -83,6 +84,7 @@ public class CombatHack {
         min = Helper.randomDouble(0.5, 0.25, 0.25, 0.75);
         max = Helper.randomDouble(1.5, 0.3, 1, 2);
         gamma = Helper.randomDouble(1, 0.4, 0.5, 2);
+        critMinVelocity = Helper.randomDouble(-0.1, 0.1, -0.2, 0);
     }
 
     public boolean cancelBreaking() {
@@ -157,6 +159,9 @@ public class CombatHack {
     private void maybeMiss() {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (target != null && mc.targetedEntity == null && !mc.player.isUsingItem() && ThreadLocalRandom.current().nextDouble() < TIN.config.getMissChance()) {
+            if (mc.player.getAttackCooldownProgress(0) < 0.2) {
+                return;
+            }
             if (TIN.config.isAimbotButtonPressed()) {
                 missSignal = true;
                 ((IMinecraftClient) mc).doAttackA();
@@ -168,7 +173,7 @@ public class CombatHack {
     private void maybeAttack() {
         MinecraftClient mc = MinecraftClient.getInstance();
         Entity targetedEntity = mc.targetedEntity;
-        if (targetedEntity != null && nextAttackTicks == 0 && (!TIN.config.waitForCrits || !Helper.shouldWaitForCrit())) {
+        if (targetedEntity != null && nextAttackTicks == 0 && (!TIN.config.waitForCrits || !Helper.shouldWaitForCrit(critMinVelocity))) {
             if (targetedEntity instanceof LivingEntity livingEntity) {
                 if (livingEntity.hurtTime > 0 || !livingEntity.isAlive()) {
                     return;

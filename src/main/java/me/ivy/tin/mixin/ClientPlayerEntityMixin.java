@@ -12,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPlayerEntityMixin {
     @Shadow
     public float nauseaIntensity;
-    @Shadow
-    public float prevNauseaIntensity;
 
     @Inject(at = @At("TAIL"),
             method = "tickNausea(Z)V")

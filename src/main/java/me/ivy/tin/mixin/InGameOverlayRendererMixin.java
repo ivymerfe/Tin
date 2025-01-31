@@ -14,6 +14,6 @@ public class InGameOverlayRendererMixin {
             target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"),
             method = "renderFireOverlay")
     private static void translate2(MatrixStack matrices, float x, float y, float z) {
-        matrices.translate(x, y- Tin.getRenderHack().getFireOffset(), z);
+        matrices.translate(x, y + Tin.getRenderHack().getFireOffset(), z);
     }
 }

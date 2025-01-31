@@ -3,17 +3,16 @@ package me.ivy.tin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.util.math.MathHelper;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Helper {
     public static int randomInt(int origin, int deviation, int min, int max) {
-        return MathHelper.clamp(ThreadLocalRandom.current().nextInt(origin-deviation, origin+deviation), min, max);
+        return ThreadLocalRandom.current().nextInt(Math.max(min, origin-deviation), Math.min(max, origin+deviation));
     }
 
     public static double randomDouble(double origin, double deviation, double min, double max) {
-        return MathHelper.clamp(ThreadLocalRandom.current().nextDouble(origin-deviation, origin+deviation), min, max);
+        return ThreadLocalRandom.current().nextDouble(Math.max(min, origin-deviation), Math.min(max, origin+deviation));
     }
 
     public static double smoothFunction(double x, double alpha, double beta, double min, double max) {
@@ -24,13 +23,13 @@ public class Helper {
         return a*Math.cos(alpha*Math.pow(x*scale, beta)) + b;
     }
 
-    public static boolean shouldWaitForCrit() {
+    public static boolean shouldWaitForCrit(double minVelocity) {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
             return false;
         }
         return MinecraftClient.getInstance().options.jumpKey.isPressed()
-                && (player.isOnGround() || player.getVelocity().y > -0.1)
+                && (player.isOnGround() || player.getVelocity().y > minVelocity)
                 && !player.isClimbing()
                 && !player.isTouchingWater()
                 && !player.hasStatusEffect(StatusEffects.BLINDNESS)

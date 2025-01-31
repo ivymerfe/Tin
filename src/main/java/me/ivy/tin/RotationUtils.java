@@ -68,6 +68,6 @@ public class RotationUtils
 	public static double angleToCursorDelta(double angle) {
 		double m = getMouseSensivityMultiplier();
 		double deltaRestored = angle / 0.15;  // Multiplier from changeLookDirection
-		return Math.round(deltaRestored/m)*m;  // Bypass detection
+		return Math.round(deltaRestored/m)*m;  // Bypass detection: mouseX and mouseY = integer!
 	}
 }

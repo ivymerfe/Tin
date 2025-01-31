@@ -27,6 +27,9 @@ public class HeldItemRendererMixin {
             int light,
             CallbackInfo ci
     ) {
+        if (stack.getItem().equals(Items.SHIELD)) {
+            matrices.translate(0, Tin.getRenderHack().getShieldOffset(), 0);
+        }
         matrices.translate(Tin.getRenderHack().getHeldItemOffset());
     }
 }

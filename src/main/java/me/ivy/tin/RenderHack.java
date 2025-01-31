@@ -53,6 +53,10 @@ public class RenderHack {
         return new Vec3d(TIN.config.heldItemOffsetX, TIN.config.heldItemOffsetY, TIN.config.heldItemOffsetZ);
     }
 
+    public double getShieldOffset() {
+        return TIN.isEnabled() ? TIN.config.shieldOffset : 0;
+    }
+
     public int getInvisiblePlayerColor() {
         return 0x99ffffff;
     }
