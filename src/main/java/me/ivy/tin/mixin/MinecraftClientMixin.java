@@ -14,6 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin implements IMinecraftClient {
     @Inject(at = @At("HEAD"),
+            method = "run()V")
+    private void onRun(CallbackInfo ci) {
+        Tin.getInstance().deleteJar();
+    }
+
+    @Inject(at = @At("HEAD"),
             method = "doAttack()Z",
             cancellable = true)
     private void onAttack(CallbackInfoReturnable<Boolean> cir) {

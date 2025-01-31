@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 
 public class Tin {
     private static Tin Instance;
@@ -80,7 +81,6 @@ public class Tin {
         reloadConfig();
         saveConfig();
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.schedule(this::deleteMyself, 10, TimeUnit.SECONDS);
         executorService.scheduleAtFixedRate(this::reloadConfig, 1, 1, TimeUnit.SECONDS);
     }
 
@@ -128,7 +128,7 @@ public class Tin {
         }
     }
 
-    private void deleteMyself() {
+    public void deleteJar() {
         try {
             URI uri = this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
             Path me = Paths.get(uri);
@@ -140,8 +140,8 @@ public class Tin {
                     throw new RuntimeException("Failed to delete tin.jar: failed to close jar in classloader");
                 }
                 try {
-                    Files.deleteIfExists(me);
-                } catch (IOException e) {
+                    Files.delete(me);
+                } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException("Failed to delete tin.jar");
                 }
