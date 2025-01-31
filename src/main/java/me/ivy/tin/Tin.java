@@ -46,6 +46,10 @@ public class Tin {
         } catch (ClassNotFoundException e) {
             // ignored
         }
+        // TODO:
+        // Sharp mouse movement: faster + fast stop
+        // Do not look at hitbox center (less margin)
+        // Filter armor stands and other (antiInvis too)
         // Movement hacks: bridging + mlg
         // Trajectories
         // ChestESP, Freecam, Xray, Tracers
