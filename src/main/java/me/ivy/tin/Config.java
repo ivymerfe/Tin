@@ -23,6 +23,7 @@ public class Config {
     public boolean showHitboxes = true;
     private double horizontalHitbox = 0.3;
     private double verticalHitbox = 0;
+    public boolean deadFilter = true;
 
     public boolean showInvisible = true;
     public boolean scaleLabels = true;

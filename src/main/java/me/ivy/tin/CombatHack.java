@@ -195,6 +195,9 @@ public class CombatHack {
             return;
         }
         MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.currentScreen != null) {
+            return;
+        }
         if (!TIN.config.isAimbotButtonPressed()) {
             return;
         }
