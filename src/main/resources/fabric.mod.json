@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "fabric-game-rule-api-v1",
-	"version": "1.0.62+7feeb73304",
+	"version": "1.0.63+7d48d43904",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -15,7 +15,7 @@
 		"fabricloader": ">=0.16.9",
 		"minecraft": "~1.21.4",
 		"java": ">=21",
-		"fabric-api": "=0.111.0+1.21.4",
-		"fabric-game-rule-api-v1": "=1.0.62+7feeb73304"
+		"fabric-api": "=0.115.1+1.21.4",
+		"fabric-game-rule-api-v1": "=1.0.63+7d48d43904"
 	}
 }
